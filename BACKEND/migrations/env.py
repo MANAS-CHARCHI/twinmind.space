@@ -1,41 +1,55 @@
+import sys
+import os
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
+
+from sqlalchemy import create_engine, pool
 from alembic import context
-import sys, os
 
+# 1. ADD PATH SO PYTHON CAN FIND YOUR APP FOLDER
 sys.path.append(os.getcwd())
-from app.db.session import Base
-from app.core.config import settings
 
+# 2. IMPORT YOUR CORE SETTINGS AND METADATA
+from app.core.config import settings
+from app.db.session import Base
+# Import your models here so Alembic "sees" them for autogenerate
+from app.memory.models import MemoryVector 
+
+# 3. SETUP LOGGING
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Inject sync DB URL
-config.set_main_option("sqlalchemy.url", settings.SYNC_DATABASE_URL)
+# 4. LINK THE METADATA
 target_metadata = Base.metadata
 
-def run_migrations_offline():
+def run_migrations_offline() -> None:
+    """Run migrations in 'offline' mode."""
+    # We use settings.SYNC_DATABASE_URL instead of config.get_main_option
+    url = settings.SYNC_DATABASE_URL
     context.configure(
-        url=settings.SYNC_DATABASE_URL,
+        url=url,
         target_metadata=target_metadata,
         literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
     )
 
     with context.begin_transaction():
         context.run_migrations()
 
-def run_migrations_online():
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode."""
+    
+    # Corrected: use create_engine for the sync URL
+    connectable = create_engine(
+        settings.SYNC_DATABASE_URL,
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection,
+            connection=connection, 
             target_metadata=target_metadata,
+            compare_type=True  # Important for detecting field changes
         )
 
         with context.begin_transaction():
