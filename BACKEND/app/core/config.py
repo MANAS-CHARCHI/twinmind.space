@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     DATABASE_HOST: str
     DATABASE_PORT: int = 5432
 
+    LLM_API_ADDRESS: str
+    GEMINI_API_KEY: str
+    
     DEBUG: bool = False
 
     CORS_ORIGINS: list[str] = ["*"]

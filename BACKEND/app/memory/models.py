@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import Column, String, Text, DateTime, func, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from pgvector.sqlalchemy import Vector
-from app.db.session import Base  # Import the Base you already created
+from app.db.session import Base
 
 class MemoryVector(Base):
     __tablename__ = "memory_vectors"

@@ -1,1 +1,23 @@
 services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: twinmind_db
+    restart: always
+    environment:
+      POSTGRES_USER: twinmind
+      POSTGRES_PASSWORD: twinmind_password
+      POSTGRES_DB: twinmind
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init:/docker-entrypoint-initdb.d
+  # redis:
+  #   image: redis:7
+  #   container_name: twinmind_redis
+  #   restart: always
+  #   ports:
+  #     - "6379:6379"
+
+volumes:
+  postgres_data:
