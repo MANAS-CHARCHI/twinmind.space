@@ -1,8 +1,9 @@
 import uuid
-from sqlalchemy import Column, String, Text, DateTime, func, ForeignKey
+from sqlalchemy import Column, String, Text, DateTime, func, ForeignKey, Integer
 from sqlalchemy.dialects.postgresql import UUID
 from pgvector.sqlalchemy import Vector
 from app.db.session import Base
+from app.db.models.user_model import UserEmails, User
 
 class MemoryVector(Base):
     __tablename__ = "memory_vectors"
@@ -23,3 +24,13 @@ class MemoryVector(Base):
     embedding_model = Column(String, nullable=False, default="nomic-embed-text")
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class EmailEmbedding(Base):
+    __tablename__ = "email_embeddings"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email_id = Column(Integer, ForeignKey("user_emails.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    embedding=Column(Vector(768))
+    content_chunk = Column(Text)
+    

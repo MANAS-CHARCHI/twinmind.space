@@ -6,6 +6,10 @@ class Settings(BaseSettings):
     DATABASE_HOST: str
     DATABASE_PORT: int = 5432
 
+    SECRET_KEY: str
+    REFRESH_SECRET_KEY: str
+    ALGORITHM: str
+
     LLM_API_ADDRESS: str
     GEMINI_API_KEY: str
     
