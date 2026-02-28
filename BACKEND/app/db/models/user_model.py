@@ -14,7 +14,10 @@ class User(Base):
     hashed_password = Column(String, nullable=True)
     full_name = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
-    google_refresh_token = Column(LargeBinary, nullable=True)
+    google_refresh_token = Column(String, nullable=True)
+    google_access_token = Column(String, nullable=True)
+    google_token_expiry = Column(DateTime, nullable=True)
+    is_scanned=Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
@@ -29,12 +32,13 @@ class UserEmails(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
-    message_id = Column(Text, nullable=False)
+    message_id = Column(Text, nullable=False, unique=True)
     subject = Column(Text)
     sender = Column(Text)
     body_plain = Column(Text)
     received_at = Column(DateTime(timezone=True))
     is_processed = Column(Boolean, default=False)
+    is_sent_by_user=Column(Boolean, default=False)
 
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
@@ -45,3 +49,5 @@ class RefreshToken(Base):
     expires_at = Column(DateTime(timezone=True), nullable=False)
 
     user = relationship("User", backref="refresh_tokens")
+
+    

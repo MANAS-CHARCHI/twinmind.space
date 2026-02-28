@@ -45,3 +45,58 @@ async def answer_me_gemini(context: str, user_prompt: str) -> str:
         except Exception as e:
             print(f"Gemini Connection Error: {e}")
             return None
+        
+STRICT_IDENTITY_PROMPT = """
+You are an expert Linguistic Profiler. Your goal is to maintain a 'Writing Identity Profile' (Markdown) for a specific user.
+
+INSTRUCTIONS:
+1. Review the EXISTING PROFILE (if any).
+2. Analyze the NEW EMAILS for patterns: Greetings, Sign-offs, Tone, Sentence Length, and specific Vocabulary.
+3. REWRITE the profile. Do not just append. Refine the existing sections to be more accurate based on the new evidence.
+4. The output MUST be valid Markdown.
+5. Focus on 'How' they write, so a future AI can mimic this user perfectly.
+"""
+
+async def update_user_identity_gemini(existing_md: str, new_emails_text: str) -> str:
+    """Calls Gemini to refactor the user_id.md file"""
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={settings.GEMINI_API_KEY}"    
+    
+    # We combine the task instructions with the data
+    user_content = f"""
+    EXISTING PROFILE:
+    {existing_md if existing_md else "No profile exists yet. Create the first version."}
+
+    NEW EMAILS TO ANALYZE:
+    {new_emails_text}
+
+    TASK: Refactor the profile based on these new emails. Return only the updated Markdown.
+    """
+    
+    payload = {
+        "contents": [{
+            "parts": [{
+                "text": f"{STRICT_IDENTITY_PROMPT}\n\n{user_content}"
+            }]
+        }], 
+        "generationConfig": {
+            "temperature": 0.2,  # Small bit of creativity helps with linguistic patterns
+            "maxOutputTokens": 2048, # Increased to allow for a full Markdown file
+        }
+    }
+    
+    async with httpx.AsyncClient() as client:
+        try:
+            res = await client.post(url, json=payload, timeout=30.0)
+            data = res.json()
+            
+            # Error checking for API response
+            if "candidates" not in data or not data["candidates"]:
+                print(f"Gemini API Error: {data}")
+                return None
+                
+            return data['candidates'][0]['content']['parts'][0]['text'].strip()
+            
+        except Exception as e:
+            print(f"Gemini Connection Error: {e}")
+            return None

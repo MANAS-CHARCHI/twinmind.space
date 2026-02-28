@@ -12,6 +12,10 @@ class Settings(BaseSettings):
 
     LLM_API_ADDRESS: str
     GEMINI_API_KEY: str
+
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    GOOGLE_REDIRECT_URI: str
     
     DEBUG: bool = False
 

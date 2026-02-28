@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Text, DateTime, func, ForeignKey, Integer
+from sqlalchemy import Column, String, Text, DateTime, func, ForeignKey, Integer, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from pgvector.sqlalchemy import Vector
 from app.db.session import Base
