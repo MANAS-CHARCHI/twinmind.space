@@ -1,2 +1,4 @@
 BACKEND/.env
 BACKEND/.venv
+jupiter/.venv
+jupiter/.ipynb_checkpoints
